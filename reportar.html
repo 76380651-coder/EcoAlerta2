@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Reportar Incidencia - EcoAlerta</title>
+
+<link rel="stylesheet" href="css/estilos.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<script>
+
+const rol = localStorage.getItem("rol");
+
+if(!rol){
+
+    window.location.href = "login.html";
+
+}
+
+</script>
+
+</head>
+
+<body>
+
+<div class="menu">
+
+    <h2>🌱 EcoAlerta</h2>
+
+    <a class="solo-trabajador" href="index.html">
+    🏠 Inicio
+    </a>
+
+    <a href="reportar.html">
+    🗑️ Reportar
+    </a>
+
+    <a class="solo-trabajador" href="misreportes.html">
+    📋 Mis Reportes
+    </a>
+
+    <a href="mapa.html">
+    🗺️ Mapa
+    </a>
+
+    <a href="horarios.html">
+    🕒 Horarios
+    </a>
+
+    <a class="solo-trabajador" href="estadisticas.html">
+    📊 Estadísticas
+    </a>
+
+    <a class="solo-trabajador" href="perfil.html">
+    👤 Perfil
+    </a>
+
+    <a href="#" onclick="cerrarSesion()">
+    🚪 Cerrar Sesión
+    </a>
+
+</div>
+
+<div class="contenido">
+
+    <h1>📸 Reportar Incidencia</h1>
+
+    <p>
+    Reporta acumulación de basura, residuos o problemas ambientales en tu zona.
+    </p>
+
+    <form id="formReporte">
+
+        <label>📍 Ubicación</label>
+
+        <input
+        type="text"
+        id="ubicacion"
+        placeholder="Ejemplo: Parque Principal"
+        required>
+
+        <button
+        type="button"
+        onclick="obtenerUbicacion()">
+
+        📍 Obtener Ubicación
+
+        </button>
+
+        <br><br>
+
+        <label>📝 Descripción</label>
+
+        <textarea
+        id="descripcion"
+        placeholder="Describe el problema..."
+        required></textarea>
+
+        <label>📷 Fotografía (Opcional)</label>
+
+        <input
+        type="file"
+        id="foto"
+        accept="image/*">
+
+        <button type="submit">
+
+        <i class="fas fa-paper-plane"></i>
+
+        Enviar Reporte
+
+        </button>
+
+    </form>
+
+    <div class="alerta">
+
+        💡 Mientras más detalles proporciones, más rápida será la atención.
+
+    </div>
+
+</div>
+
+<script>
+
+function obtenerUbicacion(){
+
+    if(!navigator.geolocation){
+
+        alert(
+        "Tu navegador no soporta geolocalización"
+        );
+
+        return;
+
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(posicion){
+
+            document.getElementById(
+            "ubicacion"
+            ).value =
+
+            posicion.coords.latitude +
+            ", " +
+            posicion.coords.longitude;
+
+        },
+
+        function(){
+
+            alert(
+            "No se pudo obtener la ubicación"
+            );
+
+        }
+
+    );
+
+}
+
+</script>
+
+<script src="js/script.js"></script>
+
+</body>
+
+</html>

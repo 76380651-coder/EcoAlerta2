@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Horarios de Recolección - EcoAlerta</title>
+
+<link rel="stylesheet" href="css/estilos.css">
+
+<script>
+
+const rol = localStorage.getItem("rol");
+
+if(!rol){
+
+    window.location.href = "login.html";
+
+}
+
+</script>
+
+</head>
+
+<body>
+
+<div class="menu">
+
+    <h2>🌱 EcoAlerta</h2>
+
+    <a class="solo-trabajador" href="index.html">
+    🏠 Inicio
+    </a>
+
+    <a href="reportar.html">
+    🗑️ Reportar
+    </a>
+
+    <a class="solo-trabajador" href="misreportes.html">
+    📋 Mis Reportes
+    </a>
+
+    <a href="mapa.html">
+    🗺️ Mapa
+    </a>
+
+    <a href="horarios.html">
+    🕒 Horarios
+    </a>
+
+    <a class="solo-trabajador" href="estadisticas.html">
+    📊 Estadísticas
+    </a>
+
+    <a class="solo-trabajador" href="perfil.html">
+    👤 Perfil
+    </a>
+
+    <a href="#" onclick="cerrarSesion()">
+    🚪 Cerrar Sesión
+    </a>
+
+</div>
+
+<div class="contenido">
+
+    <h1>🚛 Horarios de Recolección</h1>
+
+    <p>
+    Consulta los horarios establecidos para el paso del camión recolector en cada zona del distrito.
+    </p>
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Zona</th>
+
+                <th>Día</th>
+
+                <th>Horario</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <tr>
+
+                <td>Centro</td>
+
+                <td>Lunes - Miércoles - Viernes</td>
+
+                <td>07:30 PM</td>
+
+            </tr>
+
+            <tr>
+
+                <td>Norte</td>
+
+                <td>Martes - Jueves - Sábado</td>
+
+                <td>08:00 PM</td>
+
+            </tr>
+
+            <tr>
+
+                <td>Sur</td>
+
+                <td>Lunes - Jueves</td>
+
+                <td>08:30 PM</td>
+
+            </tr>
+
+            <tr>
+
+                <td>Este</td>
+
+                <td>Miércoles - Viernes</td>
+
+                <td>09:00 PM</td>
+
+            </tr>
+
+            <tr>
+
+                <td>Oeste</td>
+
+                <td>Martes - Sábado</td>
+
+                <td>09:30 PM</td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+    <div class="alerta">
+
+        ⚠️ Recuerda sacar tus residuos 30 minutos antes del horario programado.
+
+    </div>
+
+    <div class="tarjetas">
+
+        <div class="tarjeta">
+
+            <h2>♻️</h2>
+
+            <p>
+            Mantén separables los residuos reciclables.
+            </p>
+
+        </div>
+
+        <div class="tarjeta">
+
+            <h2>🕒</h2>
+
+            <p>
+            Respeta los horarios para evitar acumulación de basura.
+            </p>
+
+        </div>
+
+        <div class="tarjeta">
+
+            <h2>🌎</h2>
+
+            <p>
+            Contribuye a mantener limpio nuestro distrito.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/script.js"></script>
+
+</body>
+
+</html>

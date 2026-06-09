@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mis Reportes - EcoAlerta</title>
+
+<link rel="stylesheet" href="css/estilos.css">
+
+<script>
+
+const rol = localStorage.getItem("rol");
+
+if(!rol){
+
+    window.location.href = "login.html";
+
+}
+
+</script>
+
+</head>
+
+<body>
+
+<!-- MENÚ -->
+
+<div class="menu">
+
+    <h2>🌱 EcoAlerta</h2>
+
+    <a class="solo-trabajador" href="index.html">
+    🏠 Inicio
+    </a>
+
+    <a href="reportar.html">
+    🗑️ Reportar
+    </a>
+
+    <a class="solo-trabajador" href="misreportes.html">
+    📋 Mis Reportes
+    </a>
+
+    <a href="mapa.html">
+    🗺️ Mapa
+    </a>
+
+    <a href="horarios.html">
+    🕒 Horarios
+    </a>
+
+    <a class="solo-trabajador" href="estadisticas.html">
+    📊 Estadísticas
+    </a>
+
+    <a class="solo-trabajador" href="perfil.html">
+    👤 Perfil
+    </a>
+
+    <a href="#" onclick="cerrarSesion()">
+    🚪 Cerrar Sesión
+    </a>
+
+</div>
+
+<!-- CONTENIDO -->
+
+<div class="contenido">
+
+    <h1>📋 Mis Reportes</h1>
+
+    <p>
+    Consulta y administra los reportes registrados en EcoAlerta.
+    </p>
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Ubicación</th>
+
+                <th>Descripción</th>
+
+                <th>Fecha</th>
+
+                <th>Estado</th>
+
+                <th>Acciones</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="tablaReportes">
+
+        </tbody>
+
+    </table>
+
+    <br>
+
+    <button onclick="eliminarTodos()">
+
+        🗑 Eliminar Todos los Reportes
+
+    </button>
+
+</div>
+
+<script src="js/script.js"></script>
+
+</body>
+
+</html>

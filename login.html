@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login - EcoAlerta</title>
+
+<link rel="stylesheet" href="css/estilos.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <h1>🌱 EcoAlerta</h1>
+
+    <h3>Iniciar Sesión</h3>
+
+    <input
+    type="text"
+    id="usuario"
+    placeholder="Usuario">
+
+    <input
+    type="password"
+    id="clave"
+    placeholder="Contraseña">
+
+    <button onclick="loginTrabajador()">
+
+        <i class="fas fa-user-shield"></i>
+
+        Ingresar como Trabajador
+
+    </button>
+
+    <br><br>
+
+    <button onclick="loginVecino()">
+
+        <i class="fas fa-house-user"></i>
+
+        Ingresar como Vecino
+
+    </button>
+
+</div>
+
+<script src="js/script.js"></script>
+
+</body>
+
+</html>

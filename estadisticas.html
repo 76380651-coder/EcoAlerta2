@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Estadísticas - EcoAlerta</title>
+
+<link rel="stylesheet" href="css/estilos.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const rol = localStorage.getItem("rol");
+
+if(rol !== "trabajador"){
+
+    window.location.href = "login.html";
+
+}
+
+</script>
+
+</head>
+
+<body>
+
+<div class="menu">
+
+    <h2>🌱 EcoAlerta</h2>
+
+    <a class="solo-trabajador" href="index.html">
+    🏠 Inicio
+    </a>
+
+    <a href="reportar.html">
+    🗑️ Reportar
+    </a>
+
+    <a class="solo-trabajador" href="misreportes.html">
+    📋 Mis Reportes
+    </a>
+
+    <a href="mapa.html">
+    🗺️ Mapa
+    </a>
+
+    <a href="horarios.html">
+    🕒 Horarios
+    </a>
+
+    <a class="solo-trabajador" href="estadisticas.html">
+    📊 Estadísticas
+    </a>
+
+    <a class="solo-trabajador" href="perfil.html">
+    👤 Perfil
+    </a>
+
+    <a href="#" onclick="cerrarSesion()">
+    🚪 Cerrar Sesión
+    </a>
+
+</div>
+
+<div class="contenido">
+
+    <h1>📊 Estadísticas de Reportes</h1>
+
+    <p>
+    Visualización general de incidencias registradas en EcoAlerta.
+    </p>
+
+    <div class="tarjetas">
+
+        <div class="tarjeta">
+
+            <h2 id="totalReportes">0</h2>
+
+            <p>Total Reportes</p>
+
+        </div>
+
+        <div class="tarjeta">
+
+            <h2 id="pendientes">0</h2>
+
+            <p>Pendientes</p>
+
+        </div>
+
+        <div class="tarjeta">
+
+            <h2 id="atendidos">0</h2>
+
+            <p>Atendidos</p>
+
+        </div>
+
+    </div>
+
+    <canvas id="grafico"></canvas>
+
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const reportes =
+    JSON.parse(
+        localStorage.getItem("reportes")
+    ) || [];
+
+    const pendientes =
+    reportes.filter(
+        r => r.estado === "Pendiente"
+    ).length;
+
+    const atendidos =
+    reportes.filter(
+        r => r.estado === "Atendido"
+    ).length;
+
+    document.getElementById(
+        "totalReportes"
+    ).textContent =
+    reportes.length;
+
+    document.getElementById(
+        "pendientes"
+    ).textContent =
+    pendientes;
+
+    document.getElementById(
+        "atendidos"
+    ).textContent =
+    atendidos;
+
+});
+
+</script>
+
+<script src="js/script.js"></script>
+
+</body>
+
+</html>

@@ -1,151 +1,417 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Estadísticas - EcoAlerta</title>
-
-<link rel="stylesheet" href="css/estilos.css">
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-
-const rol = localStorage.getItem("rol");
-
-if(rol !== "trabajador"){
-
-    window.location.href = "login.html";
-
-}
-
-</script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoAlerta - Estadísticas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/estilos.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stat-card {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+        }
+        .stat-card .stat-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+        .stat-card .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        .stat-card .stat-label {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+        .stat-card .stat-trend {
+            font-size: 12px;
+            margin-top: 8px;
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+        .stat-card .stat-trend.up {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+        .stat-card .stat-trend.down {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+        .stat-card .stat-trend.neutral {
+            background: rgba(100, 116, 139, 0.15);
+            color: #94a3b8;
+        }
+        .stat-card .bg-accent {
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            font-size: 80px;
+            opacity: 0.05;
+        }
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 992px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .chart-box {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+        .chart-box h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chart-box h3 i {
+            color: var(--primary);
+        }
+        .chart-box canvas {
+            max-height: 250px;
+        }
+        .fecha-actualizacion {
+            color: var(--text-muted);
+            font-size: 12px;
+            text-align: right;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+        .table-mini {
+            margin-top: 12px;
+            width: 100%;
+            font-size: 13px;
+        }
+        .table-mini td {
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.2);
+        }
+        .table-mini td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #0f172a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+    </style>
 </head>
-
 <body>
+    <nav class="menu" id="menuDinamico"></nav>
+    <main class="contenido">
+        
+        <header style="margin-bottom: 30px;">
+            <h1 style="font-size: 28px; font-weight: 800; color: #ffffff;">
+                <i class="fas fa-chart-line" style="color: var(--primary);"></i> Analítica de Rendimiento Sanitario
+            </h1>
+            <p style="color:var(--text-muted); font-size:14px;">Dashboard de indicadores clave (KPI) y métricas de resolución del distrito.</p>
+        </header>
 
-<div class="menu">
-
-    <h2>🌱 EcoAlerta</h2>
-
-    <a class="solo-trabajador" href="index.html">
-    🏠 Inicio
-    </a>
-
-    <a href="reportar.html">
-    🗑️ Reportar
-    </a>
-
-    <a class="solo-trabajador" href="misreportes.html">
-    📋 Mis Reportes
-    </a>
-
-    <a href="mapa.html">
-    🗺️ Mapa
-    </a>
-
-    <a href="horarios.html">
-    🕒 Horarios
-    </a>
-
-    <a class="solo-trabajador" href="estadisticas.html">
-    📊 Estadísticas
-    </a>
-
-    <a class="solo-trabajador" href="perfil.html">
-    👤 Perfil
-    </a>
-
-    <a href="#" onclick="cerrarSesion()">
-    🚪 Cerrar Sesión
-    </a>
-
-</div>
-
-<div class="contenido">
-
-    <h1>📊 Estadísticas de Reportes</h1>
-
-    <p>
-    Visualización general de incidencias registradas en EcoAlerta.
-    </p>
-
-    <div class="tarjetas">
-
-        <div class="tarjeta">
-
-            <h2 id="totalReportes">0</h2>
-
-            <p>Total Reportes</p>
-
+        <!-- ===== TARJETAS KPI ===== -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px;" id="kpiContainer">
+            <!-- Generado por JS -->
         </div>
 
-        <div class="tarjeta">
-
-            <h2 id="pendientes">0</h2>
-
-            <p>Pendientes</p>
-
+        <!-- ===== GRÁFICOS PRINCIPALES ===== -->
+        <div class="chart-grid" style="margin-bottom: 30px;">
+            <div class="chart-box">
+                <h3><i class="fas fa-chart-pie"></i> Distribución por Estado</h3>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="graficoDona"></canvas>
+                </div>
+            </div>
+            <div class="chart-box">
+                <h3><i class="fas fa-chart-bar"></i> Evolución de Estados</h3>
+                <div style="height: 220px; position: relative;">
+                    <canvas id="graficoBarras"></canvas>
+                </div>
+            </div>
         </div>
 
-        <div class="tarjeta">
-
-            <h2 id="atendidos">0</h2>
-
-            <p>Atendidos</p>
-
+        <!-- ===== DETALLE POR ZONA ===== -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 30px;">
+            <div class="chart-box">
+                <h3><i class="fas fa-map-marked-alt"></i> Top Zonas con Reportes</h3>
+                <div id="topZonas">
+                    <!-- Generado por JS -->
+                </div>
+            </div>
+            <div class="chart-box">
+                <h3><i class="fas fa-clock"></i> Resumen Ejecutivo</h3>
+                <div id="resumenEjecutivo">
+                    <!-- Generado por JS -->
+                </div>
+            </div>
         </div>
 
-    </div>
+        <!-- ===== TABLA DETALLADA ===== -->
+        <div class="table-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--primary);">
+                    <i class="fas fa-list-ul"></i> Detalle de Incidencias
+                </h3>
+                <span style="color: var(--text-muted); font-size: 13px;" id="totalRegistros">0 registros</span>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Ubicación</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaEstadisticas">
+                        <!-- Generado por JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    <canvas id="grafico"></canvas>
+        <div class="fecha-actualizacion">
+            <i class="fas fa-sync-alt"></i> Última actualización: <span id="fechaActualizacion"></span>
+        </div>
+    </main>
 
-</div>
+    <script src="js/model.js"></script>
+    <script src="js/view.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const model = new EcoAlertaModel();
+            const view = new EcoAlertaView();
+            view.initMenu(model.isLoggedIn());
 
-<script>
+            const reportes = model.getAll();
+            const stats = view.calcularEstadisticas(reportes);
 
-document.addEventListener("DOMContentLoaded", () => {
+            // ===== 1. KPI CARDS =====
+            const kpiContainer = document.getElementById('kpiContainer');
+            const kpis = [
+                { icon: 'fa-clipboard-list', label: 'Total Reportes', value: stats.total, color: '#10b981' },
+                { icon: 'fa-hourglass-half', label: 'Pendientes', value: stats.pendientes, color: '#ef4444' },
+                { icon: 'fa-check-circle', label: 'Atendidos', value: stats.atendidos, color: '#10b981' },
+                { icon: 'fa-times-circle', label: 'No Atendidos', value: stats.noAtendidos, color: '#64748b' },
+                { icon: 'fa-percent', label: 'Efectividad', value: stats.efectividad + '%', color: '#f59e0b' },
+            ];
 
-    const reportes =
-    JSON.parse(
-        localStorage.getItem("reportes")
-    ) || [];
+            kpiContainer.innerHTML = kpis.map(k => `
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: ${k.color}"><i class="fas ${k.icon}"></i></div>
+                    <div class="stat-number" style="color: ${k.color}">${k.value}</div>
+                    <div class="stat-label">${k.label}</div>
+                    ${k.label === 'Efectividad' ? `
+                        <div class="progress-bar">
+                            <div class="fill" style="width: ${stats.efectividad}%; background: ${k.color};"></div>
+                        </div>
+                    ` : ''}
+                    <div class="bg-accent"><i class="fas ${k.icon}"></i></div>
+                </div>
+            `).join('');
 
-    const pendientes =
-    reportes.filter(
-        r => r.estado === "Pendiente"
-    ).length;
+            // ===== 2. GRÁFICO DE DONA =====
+            const ctxDona = document.getElementById('graficoDona');
+            if (ctxDona && typeof Chart !== 'undefined') {
+                new Chart(ctxDona, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Pendientes', 'Atendidos', 'No Atendidos'],
+                        datasets: [{
+                            data: [stats.pendientes, stats.atendidos, stats.noAtendidos],
+                            backgroundColor: ['#ef4444', '#10b981', '#64748b'],
+                            borderWidth: 2,
+                            borderColor: '#1e293b',
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#f8fafc',
+                                    font: { family: 'Inter', size: 12, weight: '500' },
+                                    padding: 15,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            }
+                        },
+                        cutout: '65%'
+                    }
+                });
+            }
 
-    const atendidos =
-    reportes.filter(
-        r => r.estado === "Atendido"
-    ).length;
+            // ===== 3. GRÁFICO DE BARRAS =====
+            const ctxBarras = document.getElementById('graficoBarras');
+            if (ctxBarras && typeof Chart !== 'undefined') {
+                new Chart(ctxBarras, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Pendientes', 'Atendidos', 'No Atendidos'],
+                        datasets: [{
+                            label: 'Cantidad de Reportes',
+                            data: [stats.pendientes, stats.atendidos, stats.noAtendidos],
+                            backgroundColor: ['#ef4444', '#10b981', '#64748b'],
+                            borderRadius: 6,
+                            borderSkipped: false,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: '#94a3b8',
+                                    stepSize: 1
+                                },
+                                grid: {
+                                    color: 'rgba(51, 65, 85, 0.3)'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#94a3b8'
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
 
-    document.getElementById(
-        "totalReportes"
-    ).textContent =
-    reportes.length;
+            // ===== 4. TOP ZONAS =====
+            const topZonas = document.getElementById('topZonas');
+            const zonas = {};
+            reportes.forEach(r => {
+                const key = r.referencia.split(',')[0] || r.referencia;
+                zonas[key] = (zonas[key] || 0) + 1;
+            });
+            const sortedZonas = Object.entries(zonas).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-    document.getElementById(
-        "pendientes"
-    ).textContent =
-    pendientes;
+            if (sortedZonas.length === 0) {
+                topZonas.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">No hay datos disponibles</p>';
+            } else {
+                const max = sortedZonas[0][1];
+                topZonas.innerHTML = sortedZonas.map(([zona, count]) => `
+                    <div style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                            <span>${view.escapeXSS(zona)}</span>
+                            <span style="font-weight: 600; color: var(--primary);">${count}</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="fill" style="width: ${(count / max) * 100}%; background: var(--primary);"></div>
+                        </div>
+                    </div>
+                `).join('');
+            }
 
-    document.getElementById(
-        "atendidos"
-    ).textContent =
-    atendidos;
+            // ===== 5. RESUMEN EJECUTIVO =====
+            const resumen = document.getElementById('resumenEjecutivo');
+            const hoy = new Date();
+            const hoyStr = hoy.toISOString().split('T')[0];
+            const reportesHoy = reportes.filter(r => r.fecha === hoyStr).length;
+            const reportesSemana = reportes.filter(r => {
+                const fecha = new Date(r.fecha);
+                const diff = (hoy - fecha) / (1000 * 60 * 60 * 24);
+                return diff <= 7;
+            }).length;
 
-});
+            resumen.innerHTML = `
+                <table class="table-mini">
+                    <tr><td><i class="fas fa-calendar-day" style="color: var(--primary);"></i> Reportes hoy</td><td>${reportesHoy}</td></tr>
+                    <tr><td><i class="fas fa-calendar-week" style="color: var(--primary);"></i> Última semana</td><td>${reportesSemana}</td></tr>
+                    <tr><td><i class="fas fa-check-double" style="color: var(--primary);"></i> Tasa de atención</td><td>${stats.efectividad}%</td></tr>
+                    <tr><td><i class="fas fa-clock" style="color: var(--primary);"></i> Promedio diario</td><td>${reportes.length > 0 ? Math.round(reportes.length / 30) : 0}</td></tr>
+                    <tr><td><i class="fas fa-flag" style="color: var(--primary);"></i> Estado más común</td><td>
+                        ${stats.pendientes >= stats.atendidos && stats.pendientes >= stats.noAtendidos ? 'Pendiente' :
+                          stats.atendidos >= stats.pendientes && stats.atendidos >= stats.noAtendidos ? 'Atendido' : 'No Atendido'}
+                    </td></tr>
+                </table>
+                <div style="margin-top: 16px; padding: 12px; background: #0f172a; border-radius: 8px; border-left: 3px solid var(--primary);">
+                    <p style="font-size: 13px; color: var(--text-muted);">
+                        <i class="fas fa-lightbulb" style="color: var(--primary);"></i>
+                        ${stats.efectividad >= 70 ? '✅ Excelente rendimiento. La mayoría de reportes están siendo atendidos.' :
+                          stats.efectividad >= 40 ? '⚠️ Rendimiento moderado. Se recomienda optimizar tiempos de respuesta.' :
+                          '🔴 Rendimiento bajo. Se requiere una revisión urgente del proceso.'}
+                    </p>
+                </div>
+            `;
 
-</script>
+            // ===== 6. TABLA DETALLADA =====
+            const tablaBody = document.getElementById('tablaEstadisticas');
+            document.getElementById('totalRegistros').textContent = reportes.length + ' registros';
 
-<script src="js/script.js"></script>
+            if (reportes.length === 0) {
+                tablaBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color: var(--text-muted); padding: 30px;">No hay reportes registrados</td></tr>`;
+            } else {
+                tablaBody.innerHTML = reportes.slice().reverse().slice(0, 10).map((r, i) => `
+                    <tr>
+                        <td style="color: var(--text-muted);">${reportes.length - i}</td>
+                        <td><strong>${view.escapeXSS(r.referencia)}</strong></td>
+                        <td><span class="estado-badge ${r.estado === 'Pendiente' ? 'estado-pendiente' : r.estado === 'Atendido' ? 'estado-atendido' : 'estado-noatendido'}">${r.estado}</span></td>
+                        <td style="color: var(--text-muted); font-size: 13px;">${r.fecha}</td>
+                    </tr>
+                `).join('');
+            }
 
+            // ===== 7. FECHA DE ACTUALIZACIÓN =====
+            document.getElementById('fechaActualizacion').textContent = new Date().toLocaleString('es-PE', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        });
+    </script>
 </body>
-
 </html>

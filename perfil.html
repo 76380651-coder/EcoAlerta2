@@ -1,165 +1,39 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Perfil de Usuario - EcoAlerta</title>
-
-<link rel="stylesheet" href="css/estilos.css">
-
-<script>
-
-if(localStorage.getItem("rol") !== "trabajador"){
-
-    window.location.href = "login.html";
-
-}
-
-</script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoAlerta - Administración</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/estilos.css">
 </head>
-
 <body>
-
-<div class="menu">
-
-    <h2>🌱 EcoAlerta</h2>
-
-    <a class="solo-trabajador" href="index.html">
-    🏠 Inicio
-    </a>
-
-    <a href="reportar.html">
-    🗑️ Reportar
-    </a>
-
-    <a class="solo-trabajador" href="misreportes.html">
-    📋 Mis Reportes
-    </a>
-
-    <a href="mapa.html">
-    🗺️ Mapa
-    </a>
-
-    <a href="horarios.html">
-    🕒 Horarios
-    </a>
-
-    <a class="solo-trabajador" href="estadisticas.html">
-    📊 Estadísticas
-    </a>
-
-    <a class="solo-trabajador" href="perfil.html">
-    👤 Perfil
-    </a>
-
-    <a href="#" onclick="cerrarSesion()">
-    🚪 Cerrar Sesión
-    </a>
-
-</div>
-
-<div class="contenido">
-
-    <h1>👤 Perfil del Trabajador</h1>
-
-    <p>
-    Información del usuario encargado del monitoreo y gestión de reportes.
-    </p>
-
-    <form>
-
-        <label>Nombre Completo</label>
-
-        <input
-        type="text"
-        value="Juan Pérez Meléndez"
-        disabled>
-
-        <label>Cargo</label>
-
-        <input
-        type="text"
-        value="Supervisor Municipal"
-        disabled>
-
-        <label>Distrito</label>
-
-        <input
-        type="text"
-        value="San Sebastián - Cusco"
-        disabled>
-
-        <label>Código de Empleado</label>
-
-        <input
-        type="text"
-        value="EMP-2026-098"
-        disabled>
-
-        <label>Correo Institucional</label>
-
-        <input
-        type="text"
-        value="supervisor@ecoalerta.gob.pe"
-        disabled>
-
-        <label>Estado</label>
-
-        <input
-        type="text"
-        value="Activo"
-        disabled>
-
-    </form>
-
-    <div class="tarjetas">
-
-        <div class="tarjeta">
-
-            <h2>📋</h2>
-
-            <p>
-            Gestión de incidencias ambientales.
-            </p>
-
-        </div>
-
-        <div class="tarjeta">
-
-            <h2>📊</h2>
-
-            <p>
-            Supervisión de estadísticas y reportes.
-            </p>
-
-        </div>
-
-        <div class="tarjeta">
-
-            <h2>🌱</h2>
-
-            <p>
-            Promoción de una ciudad más limpia y sostenible.
-            </p>
-
-        </div>
-
-    </div>
-
-    <div class="alerta">
-
-        ✔ Usuario autorizado para administrar el sistema EcoAlerta.
-
-    </div>
-
-</div>
-
-<script src="js/script.js"></script>
-
+    <nav class="menu" id="menuDinamico"></nav>
+    <main class="contenido">
+        <header style="margin-bottom:40px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <h1>Panel Operativo Municipal</h1>
+                <p style="color:var(--text-muted); font-size:15px;">Control de fiscalización, despliegue de camiones e inspección de fotos.</p>
+            </div>
+            <div class="header-user-card">
+                <i class="fas fa-user-shield" style="color: var(--primary-light)"></i> <span id="nombreUsuario">Cargando...</span>
+            </div>
+        </header>
+        <section class="table-container">
+            <h2 style="font-size:18px; font-weight:700; margin-bottom:20px; color:var(--primary);">Bandeja de Fiscalización Técnica</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:80px;">Foto</th> <th>Ubicación</th> <th>Observaciones</th> <th style="width:180px;">Cambiar Estado</th> <th style="text-align:center; width:80px;">Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaReportesBody"></tbody>
+            </table>
+        </section>
+    </main>
+    <script src="js/model.js"></script>
+    <script src="js/view.js"></script>
+    <script src="js/controller.js"></script>
 </body>
-
 </html>

@@ -1,119 +1,247 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Mis Reportes - EcoAlerta</title>
-
-<link rel="stylesheet" href="css/estilos.css">
-
-<script>
-
-const rol = localStorage.getItem("rol");
-
-if(!rol){
-
-    window.location.href = "login.html";
-
-}
-
-</script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoAlerta - Mis Reportes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/estilos.css">
+    <style>
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .btn-refresh {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-refresh:hover {
+            background: var(--primary);
+            color: #041a12;
+            border-color: var(--primary);
+        }
+        .empty-state-custom {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px;
+        }
+        .empty-state-custom i {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+    </style>
 </head>
-
 <body>
+    <nav class="menu" id="menuDinamico"></nav>
+    <main class="contenido">
+        <header style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <h1 style="font-size: 28px; font-weight: 800; color: #ffffff;">
+                    <i class="fas fa-folder-open" style="color: var(--primary);"></i> Mis Reportes
+                </h1>
+                <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">
+                    Administra todas las incidencias registradas en el sistema.
+                </p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-refresh" onclick="location.reload()">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+                <span style="color: var(--text-muted); font-size: 13px;" id="totalRegistros">0 registros</span>
+            </div>
+        </header>
 
-<!-- MENÚ -->
+        <section class="table-container">
+            <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 20px; color: var(--primary);">
+                <i class="fas fa-list"></i> Bandeja de Incidencias
+            </h2>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Foto</th>
+                            <th>Ubicación</th>
+                            <th>Descripción</th>
+                            <th style="width: 180px;">Estado</th>
+                            <th style="width: 100px; text-align: center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaReportesBody">
+                        <!-- Generado por JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 
-<div class="menu">
+    <script src="js/model.js"></script>
+    <script src="js/view.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const model = new EcoAlertaModel();
+            const view = new EcoAlertaView();
+            
+            // ===== VERIFICAR SESIÓN =====
+            if (!model.isLoggedIn()) {
+                view.showToast('🔒 Debes iniciar sesión para acceder a Mis Reportes', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+                return;
+            }
+            
+            // ===== INICIALIZAR MENÚ CON LOGOUT DIRECTO AL LOGIN =====
+            view.initMenu(true, function() {
+                // Limpiar todas las claves de sesión
+                localStorage.removeItem('eco_session');
+                localStorage.removeItem('session_user');
+                localStorage.removeItem('isLoggedIn');
+                sessionStorage.clear();
+                
+                view.showToast('👋 Sesión cerrada correctamente');
+                
+                // ✅ REDIRIGIR DIRECTAMENTE AL LOGIN
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 500);
+            });
+            
+            // ===== CARGAR DATOS =====
+            cargarReportes(model, view);
+        });
 
-    <h2>🌱 EcoAlerta</h2>
+        function cargarReportes(model, view) {
+            const reportes = model.getAll();
+            const tbody = document.getElementById('tablaReportesBody');
+            
+            // Actualizar contador
+            document.getElementById('totalRegistros').textContent = reportes.length + ' registros';
+            
+            if (reportes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state-custom">
+                            <i class="fas fa-inbox"></i>
+                            <p>No hay reportes registrados</p>
+                            <p style="font-size: 13px; margin-top: 4px;">
+                                <a href="reportar.html" style="color: var(--primary); text-decoration: none;">
+                                    <i class="fas fa-plus-circle"></i> Crear el primer reporte
+                                </a>
+                            </p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
 
-    <a class="solo-trabajador" href="index.html">
-    🏠 Inicio
-    </a>
+            // Ordenar: Pendientes primero, luego por fecha (más reciente primero)
+            const sorted = [...reportes].sort((a, b) => {
+                if (a.estado === 'Pendiente' && b.estado !== 'Pendiente') return -1;
+                if (a.estado !== 'Pendiente' && b.estado === 'Pendiente') return 1;
+                return new Date(b.fecha) - new Date(a.fecha);
+            });
 
-    <a href="reportar.html">
-    🗑️ Reportar
-    </a>
+            tbody.innerHTML = sorted.map((r, index) => {
+                const estadoClass = r.estado === 'Pendiente' ? 'estado-pendiente' : 
+                                   r.estado === 'Atendido' ? 'estado-atendido' : 'estado-noatendido';
+                
+                const imagenHtml = r.imagen 
+                    ? `<img src="${r.imagen}" class="img-miniatura" onclick="verEvidencia(${r.id}, '${view.escapeXSS(r.referencia)}', '${r.fecha}')" title="Ver evidencia" style="cursor: pointer;">`
+                    : `<i class="fas fa-image-slash" style="color: var(--text-muted); font-size: 18px;"></i>`;
 
-    <a class="solo-trabajador" href="misreportes.html">
-    📋 Mis Reportes
-    </a>
+                return `
+                    <tr>
+                        <td>${imagenHtml}</td>
+                        <td><strong>${view.escapeXSS(r.referencia)}</strong></td>
+                        <td style="font-size: 13px; color: var(--text-muted); max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            ${view.escapeXSS(r.descripcion)}
+                        </td>
+                        <td>
+                            <select class="select-status" data-id="${r.id}" onchange="cambiarEstado(${r.id}, this.value)" style="padding:6px 12px; font-weight:600; border-radius:8px; border:1px solid var(--border-color); outline:none; background:#0f172a; color:#fff; font-size:13px; cursor:pointer;">
+                                <option value="Pendiente" ${r.estado === 'Pendiente' ? 'selected' : ''}>🟡 Pendiente</option>
+                                <option value="Atendido" ${r.estado === 'Atendido' ? 'selected' : ''}>🟢 Atendido</option>
+                                <option value="No Atendido" ${r.estado === 'No Atendido' ? 'selected' : ''}>⚪ No Atendido</option>
+                            </select>
+                        </td>
+                        <td style="text-align: center;">
+                            <button class="btn-delete" onclick="eliminarReporte(${r.id})" title="Eliminar reporte" style="background:transparent; border:none; color:#64748b; padding:6px 10px; border-radius:6px; cursor:pointer; transition:all 0.2s; font-size:14px;">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
 
-    <a href="mapa.html">
-    🗺️ Mapa
-    </a>
+        function cambiarEstado(id, nuevoEstado) {
+            const model = new EcoAlertaModel();
+            const view = new EcoAlertaView();
+            
+            if (model.updateStatus(id, nuevoEstado)) {
+                view.showToast(`✅ Estado actualizado a "${nuevoEstado}"`);
+                cargarReportes(model, view);
+            }
+        }
 
-    <a href="horarios.html">
-    🕒 Horarios
-    </a>
+        function eliminarReporte(id) {
+            if (!confirm('⚠️ ¿Está seguro de que desea eliminar este reporte permanentemente?')) return;
+            
+            const model = new EcoAlertaModel();
+            const view = new EcoAlertaView();
+            
+            if (model.delete(id)) {
+                view.showToast('🗑️ Reporte eliminado correctamente');
+                cargarReportes(model, view);
+            }
+        }
 
-    <a class="solo-trabajador" href="estadisticas.html">
-    📊 Estadísticas
-    </a>
+        function verEvidencia(id, referencia, fecha) {
+            const model = new EcoAlertaModel();
+            const view = new EcoAlertaView();
+            const reporte = model.getById(id);
+            
+            if (reporte && reporte.imagen) {
+                view.injectModalStructure(reporte);
+            } else {
+                view.showToast('📷 Este reporte no tiene imagen adjunta', 'error');
+            }
+        }
 
-    <a class="solo-trabajador" href="perfil.html">
-    👤 Perfil
-    </a>
+        // ============================================================
+        //  FALLBACK: CIERRE DE SESIÓN
+        // ============================================================
 
-    <a href="#" onclick="cerrarSesion()">
-    🚪 Cerrar Sesión
-    </a>
-
-</div>
-
-<!-- CONTENIDO -->
-
-<div class="contenido">
-
-    <h1>📋 Mis Reportes</h1>
-
-    <p>
-    Consulta y administra los reportes registrados en EcoAlerta.
-    </p>
-
-    <table>
-
-        <thead>
-
-            <tr>
-
-                <th>Ubicación</th>
-
-                <th>Descripción</th>
-
-                <th>Fecha</th>
-
-                <th>Estado</th>
-
-                <th>Acciones</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody id="tablaReportes">
-
-        </tbody>
-
-    </table>
-
-    <br>
-
-    <button onclick="eliminarTodos()">
-
-        🗑 Eliminar Todos los Reportes
-
-    </button>
-
-</div>
-
-<script src="js/script.js"></script>
-
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('#btnCerrarSesion') || e.target.closest('.logout-btn')) {
+                e.preventDefault();
+                const model = new EcoAlertaModel();
+                const view = new EcoAlertaView();
+                
+                localStorage.removeItem('eco_session');
+                localStorage.removeItem('session_user');
+                localStorage.removeItem('isLoggedIn');
+                sessionStorage.clear();
+                
+                view.showToast('👋 Sesión cerrada correctamente');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 500);
+            }
+        });
+    </script>
 </body>
-
 </html>

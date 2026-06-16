@@ -1,203 +1,63 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>EcoAlerta San Sebastián - Dashboard</title>
-
-<link rel="stylesheet" href="css/estilos.css">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-<script>
-
-if(localStorage.getItem("rol") !== "trabajador"){
-
-    window.location.href = "login.html";
-
-}
-
-</script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoAlerta - Panel de Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/estilos.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
 
-<div class="menu">
-
-    <h2>🌱 EcoAlerta</h2>
-
-    <a class="solo-trabajador" href="index.html">
-    <i class="fas fa-house"></i> Inicio
-    </a>
-
-    <a href="reportar.html">
-    <i class="fas fa-trash"></i> Reportar
-    </a>
-
-    <a class="solo-trabajador" href="misreportes.html">
-    <i class="fas fa-list"></i> Mis Reportes
-    </a>
-
-    <a href="mapa.html">
-    <i class="fas fa-map-location-dot"></i> Mapa
-    </a>
-
-    <a href="horarios.html">
-    <i class="fas fa-clock"></i> Horarios
-    </a>
-
-    <a class="solo-trabajador" href="estadisticas.html">
-    <i class="fas fa-chart-column"></i> Estadísticas
-    </a>
-
-    <a class="solo-trabajador" href="perfil.html">
-    <i class="fas fa-user"></i> Perfil
-    </a>
-
-    <a href="#" onclick="cerrarSesion()">
-    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-    </a>
-
-</div>
-
-<div class="contenido">
-
-    <h1>🌱 Dashboard EcoAlerta</h1>
-
-    <p>
-    Sistema inteligente para la gestión de residuos sólidos en el distrito de San Sebastián.
-    </p>
-
-    <div class="notificacion">
-
-        🔔 Recuerda sacar los residuos 30 minutos antes del paso del camión recolector.
-
-    </div>
-
-    <div class="tarjetas">
-
-        <div class="tarjeta">
-
-            <h2 id="totalReportes">0</h2>
-
-            <p>Total Reportes</p>
-
-        </div>
-
-        <div class="tarjeta">
-
-            <h2 id="pendientesDashboard">0</h2>
-
-            <p>Pendientes</p>
-
-        </div>
-
-        <div class="tarjeta">
-
-            <h2 id="atendidosDashboard">0</h2>
-
-            <p>Atendidos</p>
-
-        </div>
-
-        <div class="tarjeta">
-
-            <h2>24/7</h2>
-
-            <p>Monitoreo</p>
-
-        </div>
-
-    </div>
-
-    <div class="alerta">
-
-        📢 Última actualización del sistema: Hoy.
-
-    </div>
-
-    <h2>📍 Ubicación de Referencia</h2>
-
-    <iframe
-    src="https://maps.google.com/maps?q=San%20Sebastian%20Cusco&t=&z=14&ie=UTF-8&output=embed">
-    </iframe>
-
-    <div class="tarjetas">
-
-        <div class="tarjeta">
-
-            <h2>♻️</h2>
-
-            <p>
-            Promovemos una ciudad más limpia mediante reportes ciudadanos.
-            </p>
-
-        </div>
-
-        <div class="tarjeta">
-
-            <h2>📷</h2>
-
-            <p>
-            Reporta puntos críticos incluyendo fotografías.
-            </p>
-
-        </div>
-
-        <div class="tarjeta">
-
-            <h2>🗺️</h2>
-
-            <p>
-            Visualiza zonas con acumulación de residuos.
-            </p>
-
-        </div>
-
-    </div>
-
-</div>
-
-<script>
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    const reportes =
-    JSON.parse(
-        localStorage.getItem("reportes")
-    ) || [];
-
-    const pendientes =
-    reportes.filter(
-        r => r.estado === "Pendiente"
-    ).length;
-
-    const atendidos =
-    reportes.filter(
-        r => r.estado === "Atendido"
-    ).length;
-
-    document.getElementById(
-        "pendientesDashboard"
-    ).textContent =
-    pendientes;
-
-    document.getElementById(
-        "atendidosDashboard"
-    ).textContent =
-    atendidos;
-
-});
-
-</script>
-
-<script src="js/script.js"></script>
-
+    <nav class="menu" id="menuDinamico"></nav>
+
+    <main class="contenido" id="contenedorPrincipal">
+        
+        <header style="margin-bottom: 30px;">
+            <h1 id="tituloConsola" style="font-size: 28px; font-weight: 800; color: #ffffff; margin-bottom: 6px;">Dashboard Público</h1>
+            <p id="subtituloConsola" style="color: #94a3b8; font-size: 14px;">Monitoreo ciudadano de alertas sanitarias.</p>
+        </header>
+
+        <div id="panelAnaliticaMunicipal"></div>
+
+        <section class="tarjetas" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 30px;">
+            <div class="tarjeta" style="background: #1e293b; padding: 20px; border-radius: 12px; border-left: 5px solid #10b981;">
+                <h3 id="totalReportes" style="font-size: 24px; color: #fff; margin-bottom: 5px;">0</h3> 
+                <p style="color: #94a3b8; font-size: 13px;">Alertas Totales</p>
+            </div>
+            <div class="tarjeta" style="background: #1e293b; padding: 20px; border-radius: 12px; border-left: 5px solid #ef4444;">
+                <h3 id="totalPendientes" style="font-size: 24px; color: #ef4444; margin-bottom: 5px;">0</h3> 
+                <p style="color: #94a3b8; font-size: 13px;">En Espera</p>
+            </div>
+            <div class="tarjeta" style="background: #1e293b; padding: 20px; border-radius: 12px; border-left: 5px solid #10b981;">
+                <h3 id="totalAtendidos" style="font-size: 24px; color: #10b981; margin-bottom: 5px;">0</h3> 
+                <p style="color: #94a3b8; font-size: 13px;">Atendidos</p>
+            </div>
+        </section>
+
+        <section class="table-container" style="background: #1e293b; padding: 20px; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+            <h2 id="tituloTabla" style="font-size: 18px; margin-bottom: 15px; color: #10b981; font-weight: 700;">Historial de Incidencias</h2>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; color: #e2e8f0;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #334155;">
+                            <th style="padding: 12px;">Evidencia</th> 
+                            <th style="padding: 12px;">Ubicación</th> 
+                            <th style="padding: 12px;">Descripción</th> 
+                            <th style="padding: 12px;">Fecha</th> 
+                            <th style="padding: 12px;">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaReportesBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/model.js"></script>
+    <script src="js/view.js"></script>
+    <script src="js/controller.js"></script>
 </body>
-
 </html>

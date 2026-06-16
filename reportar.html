@@ -1,176 +1,156 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Reportar Incidencia - EcoAlerta</title>
-
-<link rel="stylesheet" href="css/estilos.css">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-<script>
-
-const rol = localStorage.getItem("rol");
-
-if(!rol){
-
-    window.location.href = "login.html";
-
-}
-
-</script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoAlerta - Crear Reporte</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/estilos.css">
 </head>
-
 <body>
 
-<div class="menu">
+    <nav class="menu" id="menuDinamico"></nav>
 
-    <h2>🌱 EcoAlerta</h2>
+    <main class="contenido">
+        
+        <header style="margin-bottom: 35px;">
+            <h1 style="font-size: 28px; font-weight: 800; color: #ffffff; margin-bottom: 6px;">
+                📸 Enviar Alerta Sanitaria
+            </h1>
+            <p style="color: #94a3b8; font-size: 14px;">
+                Su reporte se transmitirá de inmediato a las cuadrillas de limpieza.
+            </p>
+        </header>
 
-    <a class="solo-trabajador" href="index.html">
-    🏠 Inicio
-    </a>
+        <form class="form-reportar" id="formIncidencia">
+            
+            <div class="form-group">
+                <label for="txtReferencia">
+                    <i class="fas fa-map-marker-alt"></i> Ubicación Geográfica / Dirección
+                </label>
+                <input type="text" id="txtReferencia" class="form-control" placeholder="Ej. Esquina Calle San José" required>
+            </div>
 
-    <a href="reportar.html">
-    🗑️ Reportar
-    </a>
+            <button type="button" id="btnGeolocalizar" class="btn-gps">
+                <i class="fas fa-crosshairs"></i> Capturar Coordenadas por GPS
+            </button>
+            <div id="coordenadasDisplay" style="color: var(--text-muted); font-size: 13px; margin-top: -10px;"></div>
 
-    <a class="solo-trabajador" href="misreportes.html">
-    📋 Mis Reportes
-    </a>
+            <div class="form-row">
+                
+                <div class="form-group">
+                    <label for="txtDescripcion">
+                        <i class="fas fa-align-left"></i> Detalle e Indicaciones del Problema
+                    </label>
+                    <textarea id="txtDescripcion" class="form-control" placeholder="Indique tipos de residuos o dimensiones aproximadas..." required></textarea>
+                </div>
 
-    <a href="mapa.html">
-    🗺️ Mapa
-    </a>
+                <div class="form-group">
+                    <label><i class="fas fa-camera"></i> Subir Fotografía de Prueba</label>
+                    <div class="file-input-wrapper">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 28px; color: var(--primary); margin-bottom: 10px;"></i>
+                        <p style="font-size: 14px; color: #f8fafc; font-weight: 500; margin: 0;">Haga clic aquí para examinar archivos</p>
+                        <p style="font-size: 12px; color: #64748b; margin-top: 4px;">Formatos admitidos: JPG, PNG</p>
+                        <input type="file" id="fileImagen" accept="image/*">
+                    </div>
+                    <img id="previewImagen" alt="Vista previa de la imagen">
+                </div>
 
-    <a href="horarios.html">
-    🕒 Horarios
-    </a>
+            </div>
 
-    <a class="solo-trabajador" href="estadisticas.html">
-    📊 Estadísticas
-    </a>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-paper-plane"></i> Despachar Reporte Oficial
+            </button>
 
-    <a class="solo-trabajador" href="perfil.html">
-    👤 Perfil
-    </a>
+        </form>
+    </main>
 
-    <a href="#" onclick="cerrarSesion()">
-    🚪 Cerrar Sesión
-    </a>
+    <script src="js/model.js"></script>
+    <script src="js/view.js"></script>
+    <script src="js/controller.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const model = new EcoAlertaModel();
+            const view = new EcoAlertaView();
+            view.initMenu(model.isLoggedIn());
 
-</div>
+            // Previsualización de imagen
+            document.getElementById('fileImagen').addEventListener('change', function(e) {
+                const preview = document.getElementById('previewImagen');
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        preview.src = event.target.result;
+                        preview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
 
-<div class="contenido">
+            // Geolocalización
+            let latGuardada = null;
+            let lngGuardada = null;
 
-    <h1>📸 Reportar Incidencia</h1>
+            document.getElementById('btnGeolocalizar').addEventListener('click', function() {
+                if (navigator.geolocation) {
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Obteniendo ubicación...';
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            latGuardada = pos.coords.latitude;
+                            lngGuardada = pos.coords.longitude;
+                            document.getElementById('coordenadasDisplay').innerHTML = 
+                                `<i class="fas fa-check-circle" style="color: var(--primary);"></i> 
+                                Coordenadas: ${latGuardada.toFixed(6)}, ${lngGuardada.toFixed(6)}`;
+                            this.innerHTML = '<i class="fas fa-crosshairs"></i> Ubicación capturada ✅';
+                            this.style.borderColor = 'var(--primary)';
+                        },
+                        () => {
+                            this.innerHTML = '<i class="fas fa-crosshairs"></i> Capturar Coordenadas por GPS';
+                            alert('❌ No se pudo obtener la ubicación. Verifica los permisos.');
+                        }
+                    );
+                } else {
+                    alert('❌ Tu navegador no soporta GPS.');
+                }
+            });
 
-    <p>
-    Reporta acumulación de basura, residuos o problemas ambientales en tu zona.
-    </p>
+            // Envío del formulario
+            document.getElementById('formIncidencia').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const referencia = document.getElementById('txtReferencia').value.trim();
+                const descripcion = document.getElementById('txtDescripcion').value.trim();
+                const fileInput = document.getElementById('fileImagen');
 
-    <form id="formReporte">
+                if (!referencia || !descripcion) {
+                    view.showToast('❌ Completa todos los campos obligatorios', 'error');
+                    return;
+                }
 
-        <label>📍 Ubicación</label>
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imagen = event.target.result || null;
+                    model.save(referencia, descripcion, imagen, latGuardada, lngGuardada);
+                    view.showToast('🎉 ¡Reporte enviado con éxito!');
+                    document.getElementById('formIncidencia').reset();
+                    document.getElementById('previewImagen').style.display = 'none';
+                    document.getElementById('coordenadasDisplay').innerHTML = '';
+                    latGuardada = null;
+                    lngGuardada = null;
+                    document.getElementById('btnGeolocalizar').innerHTML = '<i class="fas fa-crosshairs"></i> Capturar Coordenadas por GPS';
+                };
 
-        <input
-        type="text"
-        id="ubicacion"
-        placeholder="Ejemplo: Parque Principal"
-        required>
-
-        <button
-        type="button"
-        onclick="obtenerUbicacion()">
-
-        📍 Obtener Ubicación
-
-        </button>
-
-        <br><br>
-
-        <label>📝 Descripción</label>
-
-        <textarea
-        id="descripcion"
-        placeholder="Describe el problema..."
-        required></textarea>
-
-        <label>📷 Fotografía (Opcional)</label>
-
-        <input
-        type="file"
-        id="foto"
-        accept="image/*">
-
-        <button type="submit">
-
-        <i class="fas fa-paper-plane"></i>
-
-        Enviar Reporte
-
-        </button>
-
-    </form>
-
-    <div class="alerta">
-
-        💡 Mientras más detalles proporciones, más rápida será la atención.
-
-    </div>
-
-</div>
-
-<script>
-
-function obtenerUbicacion(){
-
-    if(!navigator.geolocation){
-
-        alert(
-        "Tu navegador no soporta geolocalización"
-        );
-
-        return;
-
-    }
-
-    navigator.geolocation.getCurrentPosition(
-
-        function(posicion){
-
-            document.getElementById(
-            "ubicacion"
-            ).value =
-
-            posicion.coords.latitude +
-            ", " +
-            posicion.coords.longitude;
-
-        },
-
-        function(){
-
-            alert(
-            "No se pudo obtener la ubicación"
-            );
-
-        }
-
-    );
-
-}
-
-</script>
-
-<script src="js/script.js"></script>
-
+                if (fileInput.files[0]) {
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else {
+                    model.save(referencia, descripcion, null, latGuardada, lngGuardada);
+                    view.showToast('🎉 ¡Reporte enviado con éxito!');
+                    document.getElementById('formIncidencia').reset();
+                    document.getElementById('previewImagen').style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
-
 </html>

@@ -1,60 +1,412 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - EcoAlerta</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
 
-<title>Login - EcoAlerta</title>
+        body {
+            background: #0f172a;
+            background-image: url('https://images.unsplash.com/photo-1511497584788-876760111969?q=20&w=1000');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-<link rel="stylesheet" href="css/estilos.css">
+        /* Capa oscura semitransparente encima de la imagen */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 6, 23, 0.55);
+            z-index: 0;
+        }
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+        .login-wrapper {
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+            z-index: 1;
+        }
 
+        /* ===== EFECTO GLASSMORPHISM ===== */
+        .login-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 40px 35px;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Efecto de brillo en el borde superior */
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.4), transparent);
+            border-radius: 100%;
+        }
+
+        .login-card:hover {
+            box-shadow: 
+                0 30px 60px -12px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header i {
+            font-size: 3rem;
+            color: #10b981;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.2));
+        }
+
+        .login-header h1 {
+            color: #ffffff;
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-header h1 span {
+            color: #10b981;
+        }
+
+        .login-header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .section-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 25px 0;
+        }
+
+        .section-divider::before, .section-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-divider:not(:empty)::before { margin-right: .75em; }
+        .section-divider:not(:empty)::after { margin-left: .75em; }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .input-icon-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .input-icon-wrapper:focus-within i {
+            color: #10b981;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: #f8fafc;
+            outline: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .form-control:focus {
+            border-color: #10b981;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.08);
+        }
+
+        .btn-municipal {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #041a12;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Efecto de brillo en el botón */
+        .btn-municipal::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .btn-municipal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-municipal:hover::after {
+            opacity: 1;
+        }
+
+        .btn-municipal:active {
+            transform: scale(0.98);
+        }
+
+        .btn-vecino {
+            background: rgba(255, 255, 255, 0.04);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            backdrop-filter: blur(4px);
+        }
+
+        .btn-vecino:hover {
+            background: rgba(16, 185, 129, 0.08);
+            border-color: #10b981;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1);
+        }
+
+        .btn-vecino:active {
+            transform: scale(0.98);
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+        }
+
+        .login-footer a {
+            color: rgba(16, 185, 129, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .login-footer a:hover {
+            color: #10b981;
+            text-decoration: underline;
+        }
+
+        /* ===== EFECTO DE PARTÍCULAS SUTILES EN EL FONDO ===== */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-particles span {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(16, 185, 129, 0.15);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        .bg-particles span:nth-child(1) { top: 10%; left: 10%; animation-duration: 25s; width: 6px; height: 6px; }
+        .bg-particles span:nth-child(2) { top: 20%; right: 15%; animation-duration: 18s; width: 3px; height: 3px; }
+        .bg-particles span:nth-child(3) { bottom: 30%; left: 5%; animation-duration: 22s; width: 5px; height: 5px; }
+        .bg-particles span:nth-child(4) { bottom: 20%; right: 10%; animation-duration: 28s; width: 4px; height: 4px; }
+        .bg-particles span:nth-child(5) { top: 50%; left: 50%; animation-duration: 30s; width: 7px; height: 7px; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            25% { transform: translate(100px, -50px) scale(1.5); opacity: 1; }
+            50% { transform: translate(50px, 100px) scale(0.8); opacity: 0.5; }
+            75% { transform: translate(-80px, 50px) scale(1.2); opacity: 0.8; }
+            100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 30px 20px;
+            }
+            .login-header h1 {
+                font-size: 1.6rem;
+            }
+            .login-header i {
+                font-size: 2.4rem;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="login-container">
+    <!-- ===== PARTÍCULAS DECORATIVAS ===== -->
+    <div class="bg-particles">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
 
-    <h1>🌱 EcoAlerta</h1>
+    <div class="login-wrapper">
+        <div class="login-card">
+            
+            <div class="login-header">
+                <i class="fas fa-leaf"></i>
+                <h1>Eco<span>Alerta</span></h1>
+                <p>Distrito de San Sebastián</p>
+            </div>
 
-    <h3>Iniciar Sesión</h3>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="usuario">Usuario del Personal</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="usuario" class="form-control" placeholder="Ejemplo: admin" autocomplete="username">
+                    </div>
+                </div>
 
-    <input
-    type="text"
-    id="usuario"
-    placeholder="Usuario">
+                <div class="form-group">
+                    <label for="clave">Contraseña de Control</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="clave" class="form-control" placeholder="••••••••" autocomplete="current-password">
+                    </div>
+                </div>
 
-    <input
-    type="password"
-    id="clave"
-    placeholder="Contraseña">
+                <button type="submit" class="btn-municipal">
+                    <i class="fas fa-user-shield"></i> Autenticar Personal
+                </button>
+            </form>
 
-    <button onclick="loginTrabajador()">
+            <div class="section-divider">O CONSULTA CIUDADANA</div>
 
-        <i class="fas fa-user-shield"></i>
+            <div style="margin-top: 5px;">
+                <button type="button" class="btn-vecino" onclick="loginVecino()">
+                    <i class="fas fa-home"></i> Ingresar como Vecino Ciudadano
+                </button>
+            </div>
 
-        Ingresar como Trabajador
+            <div class="login-footer">
+                <p>¿Necesitas ayuda? <a href="#">Contáctanos</a></p>
+            </div>
 
-    </button>
+        </div>
+    </div>
 
-    <br><br>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('usuario').value.trim();
+            const pass = document.getElementById('clave').value.trim();
+            
+            if (user === 'admin' && pass === '1234') {
+                localStorage.setItem('eco_session', 'true');
+                localStorage.setItem('session_user', 'Administrador');
+                window.location.href = 'index.html';
+            } else {
+                alert('❌ Credenciales incorrectas. Usa: admin / 1234');
+            }
+        });
 
-    <button onclick="loginVecino()">
-
-        <i class="fas fa-house-user"></i>
-
-        Ingresar como Vecino
-
-    </button>
-
-</div>
-
-<script src="js/script.js"></script>
+        function loginVecino() {
+            localStorage.removeItem('eco_session');
+            localStorage.removeItem('session_user');
+            window.location.href = 'index.html';
+        }
+    </script>
 
 </body>
-
 </html>

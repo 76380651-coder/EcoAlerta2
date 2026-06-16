@@ -1,128 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Mapa de Incidencias - EcoAlerta</title>
-
-<link rel="stylesheet" href="css/estilos.css">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-<script>
-
-const rol = localStorage.getItem("rol");
-
-if(!rol){
-
-    window.location.href = "login.html";
-
-}
-
-</script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoAlerta - Mapa Urbano</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="css/estilos.css">
+    <style>
+        #mapaBox {
+            height: 73vh;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .leaflet-popup-content {
+            color: #1e293b;
+        }
+    </style>
 </head>
-
 <body>
+    <nav class="menu" id="menuDinamico"></nav>
+    <main class="contenido">
+        <h1>🗺️ GIS - Servidor de Coordenadas Geográficas</h1>
+        <p style="color:var(--text-muted); margin-bottom:20px;">Puntos críticos mapeados en tiempo real.</p>
+        <div id="mapaBox"></div>
+    </main>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/model.js"></script>
+    <script src="js/view.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const model = new EcoAlertaModel();
+            const view = new EcoAlertaView();
+            view.initMenu(model.isLoggedIn());
 
-<div class="menu">
+            // Inicializar mapa
+            const map = L.map("mapaBox").setView([-13.5336, -71.9392], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
 
-    <h2>🌱 EcoAlerta</h2>
+            // Cargar reportes
+            const reportes = model.getAll();
+            reportes.forEach(r => {
+                const imgHtml = r.imagen 
+                    ? `<br><img src="${r.imagen}" style="width:100%; max-height:150px; border-radius:6px; margin-top:5px; object-fit:cover;">` 
+                    : '';
+                
+                const estadoColor = r.estado === 'Pendiente' ? '#ef4444' : 
+                                   r.estado === 'Atendido' ? '#10b981' : '#64748b';
 
-    <a class="solo-trabajador" href="index.html">
-    🏠 Inicio
-    </a>
-
-    <a href="reportar.html">
-    🗑️ Reportar
-    </a>
-
-    <a class="solo-trabajador" href="misreportes.html">
-    📋 Mis Reportes
-    </a>
-
-    <a href="mapa.html">
-    🗺️ Mapa
-    </a>
-
-    <a href="horarios.html">
-    🕒 Horarios
-    </a>
-
-    <a class="solo-trabajador" href="estadisticas.html">
-    📊 Estadísticas
-    </a>
-
-    <a class="solo-trabajador" href="perfil.html">
-    👤 Perfil
-    </a>
-
-    <a href="#" onclick="cerrarSesion()">
-    🚪 Cerrar Sesión
-    </a>
-
-</div>
-
-<div class="contenido">
-
-    <h1>🗺️ Mapa de Incidencias</h1>
-
-    <p>
-    Visualización de zonas donde se reportan problemas de residuos sólidos.
-    </p>
-
-    <iframe
-    src="https://maps.google.com/maps?q=San%20Sebastian%20Cusco&t=&z=15&ie=UTF-8&output=embed">
-    </iframe>
-
-    <div class="tarjetas">
-
-        <div class="tarjeta">
-
-            <h2>🔴</h2>
-
-            <p>
-            Punto Crítico
-            </p>
-
-        </div>
-
-        <div class="tarjeta">
-
-            <h2>🟡</h2>
-
-            <p>
-            En Observación
-            </p>
-
-        </div>
-
-        <div class="tarjeta">
-
-            <h2>🟢</h2>
-
-            <p>
-            Zona Limpia
-            </p>
-
-        </div>
-
-    </div>
-
-    <div class="alerta">
-
-        📍 Próximamente se mostrarán los reportes directamente sobre el mapa.
-
-    </div>
-
-</div>
-
-<script src="js/script.js"></script>
-
+                L.marker([r.lat, r.lng])
+                    .addTo(map)
+                    .bindPopup(`
+                        <b>📍 ${view.escapeXSS(r.referencia)}</b>
+                        <br>${view.escapeXSS(r.descripcion)}
+                        <br><span style="display:inline-block; padding:2px 10px; border-radius:12px; background:${estadoColor}; color:white; font-size:12px; font-weight:600; margin-top:5px;">${r.estado}</span>
+                        ${imgHtml}
+                        <br><small style="color:#64748b;">${r.fecha}</small>
+                    `);
+            });
+        });
+    </script>
 </body>
-
 </html>

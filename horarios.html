@@ -1,193 +1,39 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Horarios de Recolección - EcoAlerta</title>
-
-<link rel="stylesheet" href="css/estilos.css">
-
-<script>
-
-const rol = localStorage.getItem("rol");
-
-if(!rol){
-
-    window.location.href = "login.html";
-
-}
-
-</script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoAlerta - Horarios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/estilos.css">
 </head>
-
 <body>
-
-<div class="menu">
-
-    <h2>🌱 EcoAlerta</h2>
-
-    <a class="solo-trabajador" href="index.html">
-    🏠 Inicio
-    </a>
-
-    <a href="reportar.html">
-    🗑️ Reportar
-    </a>
-
-    <a class="solo-trabajador" href="misreportes.html">
-    📋 Mis Reportes
-    </a>
-
-    <a href="mapa.html">
-    🗺️ Mapa
-    </a>
-
-    <a href="horarios.html">
-    🕒 Horarios
-    </a>
-
-    <a class="solo-trabajador" href="estadisticas.html">
-    📊 Estadísticas
-    </a>
-
-    <a class="solo-trabajador" href="perfil.html">
-    👤 Perfil
-    </a>
-
-    <a href="#" onclick="cerrarSesion()">
-    🚪 Cerrar Sesión
-    </a>
-
-</div>
-
-<div class="contenido">
-
-    <h1>🚛 Horarios de Recolección</h1>
-
-    <p>
-    Consulta los horarios establecidos para el paso del camión recolector en cada zona del distrito.
-    </p>
-
-    <table>
-
-        <thead>
-
-            <tr>
-
-                <th>Zona</th>
-
-                <th>Día</th>
-
-                <th>Horario</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-            <tr>
-
-                <td>Centro</td>
-
-                <td>Lunes - Miércoles - Viernes</td>
-
-                <td>07:30 PM</td>
-
-            </tr>
-
-            <tr>
-
-                <td>Norte</td>
-
-                <td>Martes - Jueves - Sábado</td>
-
-                <td>08:00 PM</td>
-
-            </tr>
-
-            <tr>
-
-                <td>Sur</td>
-
-                <td>Lunes - Jueves</td>
-
-                <td>08:30 PM</td>
-
-            </tr>
-
-            <tr>
-
-                <td>Este</td>
-
-                <td>Miércoles - Viernes</td>
-
-                <td>09:00 PM</td>
-
-            </tr>
-
-            <tr>
-
-                <td>Oeste</td>
-
-                <td>Martes - Sábado</td>
-
-                <td>09:30 PM</td>
-
-            </tr>
-
-        </tbody>
-
-    </table>
-
-    <div class="alerta">
-
-        ⚠️ Recuerda sacar tus residuos 30 minutos antes del horario programado.
-
-    </div>
-
-    <div class="tarjetas">
-
-        <div class="tarjeta">
-
-            <h2>♻️</h2>
-
-            <p>
-            Mantén separables los residuos reciclables.
-            </p>
-
+    <nav class="menu" id="menuDinamico"></nav>
+    <main class="contenido">
+        <h1><i class="fas fa-truck-moving" style="color: var(--primary);"></i> Planificación y Frecuencias de Recolección</h1>
+        <p style="color:var(--text-muted); margin-bottom:20px;">Optimización horaria de recojo de residuos.</p>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th>Zona Operativa</th><th>Frecuencia</th><th>Horario Fijo</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Cercado San Sebastián</strong></td><td>Lunes - Miércoles - Viernes</td><td><span class="estado-badge" style="background:#e0f2fe; color:#0369a1; padding: 5px 10px; border-radius: 12px; font-weight: 600;">19:30 Hrs</span></td></tr>
+                    <tr><td><strong>Sector Urbano Norte</strong></td><td>Martes - Jueves - Sábado</td><td><span class="estado-badge" style="background:#e0f2fe; color:#0369a1; padding: 5px 10px; border-radius: 12px; font-weight: 600;">20:00 Hrs</span></td></tr>
+                    <tr><td><strong>Zona Industrial Sur</strong></td><td>Lunes a Sábado</td><td><span class="estado-badge" style="background:#e0f2fe; color:#0369a1; padding: 5px 10px; border-radius: 12px; font-weight: 600;">22:00 Hrs</span></td></tr>
+                </tbody>
+            </table>
         </div>
-
-        <div class="tarjeta">
-
-            <h2>🕒</h2>
-
-            <p>
-            Respeta los horarios para evitar acumulación de basura.
-            </p>
-
-        </div>
-
-        <div class="tarjeta">
-
-            <h2>🌎</h2>
-
-            <p>
-            Contribuye a mantener limpio nuestro distrito.
-            </p>
-
-        </div>
-
-    </div>
-
-</div>
-
-<script src="js/script.js"></script>
-
+    </main>
+    <script src="js/model.js"></script>
+    <script src="js/view.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const model = new EcoAlertaModel();
+            const view = new EcoAlertaView();
+            view.initMenu(model.isLoggedIn());
+        });
+    </script>
 </body>
-
 </html>

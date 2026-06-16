@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoAlerta - Panel de Administración</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="css/estilos.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .admin-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-card);
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .admin-header .user-info .avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #041a12;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .admin-header .user-info .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-header .user-info .user-details .name {
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .admin-header .user-info .user-details .role {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .admin-header .user-info .badge-admin {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--primary);
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .kpi-admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-admin-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-admin-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary);
+        }
+
+        .kpi-admin-card .kpi-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+
+        .kpi-admin-card .kpi-number {
+            font-size: 30px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .kpi-admin-card .kpi-label {
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .kpi-admin-card .kpi-trend {
+            font-size: 11px;
+            margin-top: 8px;
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        .kpi-admin-card .kpi-trend.up {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        .kpi-admin-card .kpi-trend.down {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .kpi-admin-card .kpi-trend.neutral {
+            background: rgba(100, 116, 139, 0.15);
+            color: #94a3b8;
+        }
+
+        .kpi-admin-card .kpi-bg-icon {
+            position: absolute;
+            right: -10px;
+            bottom: -10px;
+            font-size: 60px;
+            opacity: 0.04;
+        }
+
+        .admin-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .admin-toolbar .left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-toolbar .left h2 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .admin-toolbar .right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-action-admin {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action-admin:hover {
+            background: var(--primary);
+            color: #041a12;
+            border-color: var(--primary);
+        }
+
+        .btn-action-admin.danger:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+        }
+
+        .select-status {
+            padding: 6px 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            background: #0f172a;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .select-status:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+        }
+
+        .select-status option {
+            background: #1e293b;
+            color: #fff;
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .table-admin td {
+            vertical-align: middle;
+        }
+
+        .table-admin .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px;
+        }
+
+        .table-admin .empty-state i {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .admin-header .user-info {
+                justify-content: center;
+            }
+            .admin-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .admin-toolbar .right {
+                flex-wrap: wrap;
+            }
+            .kpi-admin-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .kpi-admin-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="menu" id="menuDinamico"></nav>
+    
+    <main class="contenido">
+        
+        <div class="admin-header">
+            <div>
+                <h1 style="font-size: 26px; font-weight: 800; color: #ffffff;">
+                    <i class="fas fa-user-cog" style="color: var(--primary);"></i> Panel de Administración
+                </h1>
+                <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">
+                    Gestión completa de reportes, fiscalización y control operativo
+                </p>
+            </div>
+            <div class="user-info">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <span class="name" id="nombreUsuario">Cargando...</span>
+                    <span class="role">Administrador del Sistema</span>
+                </div>
+                <span class="badge-admin"><i class="fas fa-shield-alt"></i> Admin</span>
+            </div>
+        </div>
+
+        <div class="kpi-admin-grid" id="kpiContainer">
+            <!-- Generado por JS -->
+        </div>
+
+        <div class="admin-toolbar">
+            <div class="left">
+                <h2><i class="fas fa-clipboard-list"></i> Bandeja de Incidencias</h2>
+                <span style="color: var(--text-muted); font-size: 13px;" id="totalRegistros">0 registros</span>
+            </div>
+            <div class="right">
+                <button class="btn-action-admin" onclick="location.reload()">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+                <button class="btn-action-admin" onclick="exportarReportes()">
+                    <i class="fas fa-file-export"></i> Exportar
+                </button>
+                <button class="btn-action-admin danger" onclick="limpiarTodos()">
+                    <i class="fas fa-trash-alt"></i> Limpiar Todo
+                </button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div style="overflow-x: auto;">
+                <table class="table-admin">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">Foto</th>
+                            <th>Ubicación</th>
+                            <th>Descripción</th>
+                            <th>Fecha</th>
+                            <th style="width: 160px;">Estado</th>
+                            <th style="width: 80px; text-align: center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaReportesBody">
+                        <!-- Generado por JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px; color: var(--text-muted); font-size: 12px; text-align: right; padding-top: 16px; border-top: 1px solid var(--border-color);">
+            <i class="fas fa-database"></i> Datos almacenados localmente | 
+            Última actualización: <span id="fechaActualizacion"></span>
+        </div>
+    </main>
+
+    <script src="js/model.js"></script>
+    <script src="js/view.js"></script>
+    <script>
+        // ============================================================
+        //  ADMINISTRACIÓN COMPLETA
+        // ============================================================
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            const model = new EcoAlertaModel();
+            const view = new EcoAlertaView();
+            
+            // ===== VERIFICAR SESIÓN =====
+            if (!model.isLoggedIn()) {
+                view.showToast('🔒 Debes iniciar sesión para acceder al panel de administración', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+                return;
+            }
+            
+            // ===== INICIALIZAR MENÚ CON LOGOUT DIRECTO AL LOGIN =====
+            view.initMenu(true, function() {
+                // Limpiar todas las claves de sesión
+                localStorage.removeItem('eco_session');
+                localStorage.removeItem('session_user');
+                localStorage.removeItem('isLoggedIn');
+                sessionStorage.clear();
+                
+                view.showToast('👋 Sesión cerrada correctamente');
+                
+                // ✅ REDIRIGIR DIRECTAMENTE AL LOGIN
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 500);
+            });
+            
+            // ===== MOSTRAR NOMBRE DE USUARIO =====
+            const nombreEl = document.getElementById('nombreUsuario');
+            if (nombreEl) {
+                nombreEl.textContent = model.getLoggedUser() || 'Administrador';
+            }
+            
+            // ===== CARGAR DATOS =====
+            cargarDatos(model, view);
+            
+            // ===== FECHA ACTUALIZACIÓN =====
+            document.getElementById('fechaActualizacion').textContent = new Date().toLocaleString('es-PE', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        });
+
+        // ============================================================
+        //  FUNCIONES PRINCIPALES
+        // ============================================================
+
+        function cargarDatos(model, view) {
+            const reportes = model.getAll();
+            const stats = view.calcularEstadisticas(reportes);
+            
+            renderKPI(stats);
+            renderTabla(reportes, model, view);
+            document.getElementById('totalRegistros').textContent = reportes.length + ' registros';
+        }
+
+        // ============================================================
+        //  RENDER KPI
+        // ============================================================
+
+        function renderKPI(stats) {
+            const container = document.getElementById('kpiContainer');
+            
+            const kpis = [
+                { 
+                    icon: 'fa-clipboard-list', 
+                    number: stats.total, 
+                    label: 'Total Reportes', 
+                    color: '#10b981',
+                    trend: stats.total > 0 ? 'up' : 'neutral',
+                    trendText: stats.total > 0 ? 'Activos' : 'Sin datos'
+                },
+                { 
+                    icon: 'fa-hourglass-half', 
+                    number: stats.pendientes, 
+                    label: 'Pendientes', 
+                    color: '#ef4444',
+                    trend: stats.pendientes > 0 ? 'down' : 'up',
+                    trendText: stats.pendientes > 0 ? 'Requieren atención' : 'Todos atendidos'
+                },
+                { 
+                    icon: 'fa-check-circle', 
+                    number: stats.atendidos, 
+                    label: 'Atendidos', 
+                    color: '#10b981',
+                    trend: stats.atendidos > 0 ? 'up' : 'neutral',
+                    trendText: stats.atendidos > 0 ? 'Resueltos' : 'Sin atenciones'
+                },
+                { 
+                    icon: 'fa-percent', 
+                    number: stats.efectividad + '%', 
+                    label: 'Efectividad', 
+                    color: stats.efectividad >= 70 ? '#10b981' : stats.efectividad >= 40 ? '#f59e0b' : '#ef4444',
+                    trend: stats.efectividad >= 70 ? 'up' : stats.efectividad >= 40 ? 'neutral' : 'down',
+                    trendText: stats.efectividad >= 70 ? 'Excelente' : stats.efectividad >= 40 ? 'Moderado' : 'Crítico'
+                }
+            ];
+
+            container.innerHTML = kpis.map(k => `
+                <div class="kpi-admin-card">
+                    <div class="kpi-icon" style="color: ${k.color}">
+                        <i class="fas ${k.icon}"></i>
+                    </div>
+                    <div class="kpi-number" style="color: ${k.color}">${k.number}</div>
+                    <div class="kpi-label">${k.label}</div>
+                    <span class="kpi-trend ${k.trend}">
+                        <i class="fas ${k.trend === 'up' ? 'fa-arrow-up' : k.trend === 'down' ? 'fa-arrow-down' : 'fa-minus'}"></i>
+                        ${k.trendText}
+                    </span>
+                    <div class="kpi-bg-icon"><i class="fas ${k.icon}"></i></div>
+                </div>
+            `).join('');
+        }
+
+        // ============================================================
+        //  RENDER TABLA
+        // ============================================================
+
+        function renderTabla(reportes, model, view) {
+            const tbody = document.getElementById('tablaReportesBody');
+            
+            if (reportes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No hay reportes registrados en el sistema</p>
+                            <p style="font-size: 13px; margin-top: 4px;">
+                                <a href="reportar.html" style="color: var(--primary); text-decoration: none;">
+                                    <i class="fas fa-plus-circle"></i> Crear el primer reporte
+                                </a>
+                            </p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const sorted = [...reportes].sort((a, b) => {
+                if (a.estado === 'Pendiente' && b.estado !== 'Pendiente') return -1;
+                if (a.estado !== 'Pendiente' && b.estado === 'Pendiente') return 1;
+                return new Date(b.fecha) - new Date(a.fecha);
+            });
+
+            tbody.innerHTML = sorted.map((r, index) => {
+                const estadoClass = r.estado === 'Pendiente' ? 'estado-pendiente' : 
+                                   r.estado === 'Atendido' ? 'estado-atendido' : 'estado-noatendido';
+                
+                const imagenHtml = r.imagen 
+                    ? `<img src="${r.imagen}" class="img-miniatura" onclick="verEvidencia(${r.id})" title="Ver evidencia" style="cursor: pointer;">`
+                    : `<i class="fas fa-image-slash" style="color: var(--text-muted); font-size: 18px;"></i>`;
+
+                return `
+                    <tr>
+                        <td>${imagenHtml}</td>
+                        <td><strong>${view.escapeXSS(r.referencia)}</strong></td>
+                        <td style="font-size: 13px; color: var(--text-muted); max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            ${view.escapeXSS(r.descripcion)}
+                        </td>
+                        <td style="font-size: 13px; color: var(--text-muted);">${r.fecha}</td>
+                        <td>
+                            <select class="select-status" data-id="${r.id}" onchange="cambiarEstado(${r.id}, this.value)">
+                                <option value="Pendiente" ${r.estado === 'Pendiente' ? 'selected' : ''}>🟡 Pendiente</option>
+                                <option value="Atendido" ${r.estado === 'Atendido' ? 'selected' : ''}>🟢 Atendido</option>
+                                <option value="No Atendido" ${r.estado === 'No Atendido' ? 'selected' : ''}>⚪ No Atendido</option>
+                            </select>
+                        </td>
+                        <td style="text-align: center;">
+                            <button class="btn-delete" onclick="eliminarReporte(${r.id})" title="Eliminar reporte">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        //  ACCIONES DE ADMIN
+        // ============================================================
+
+        function cambiarEstado(id, nuevoEstado) {
+            const model = new EcoAlertaModel();
+            const view = new EcoAlertaView();
+            
+            if (model.updateStatus(id, nuevoEstado)) {
+                view.showToast(`✅ Estado actualizado a "${nuevoEstado}"`);
+                cargarDatos(model, view);
+            }
+        }
+
+        function eliminarReporte(id) {
+            if (!confirm('⚠️ ¿Está seguro de que desea eliminar este reporte permanentemente?')) return;
+            
+            const model = new EcoAlertaModel();
+            const view = new EcoAlertaView();
+            
+            if (model.delete(id)) {
+                view.showToast('🗑️ Reporte eliminado correctamente');
+                cargarDatos(model, view);
+            }
+        }
+
+        function verEvidencia(id) {
+            const model = new EcoAlertaModel();
+            const view = new EcoAlertaView();
+            const reporte = model.getById(id);
+            
+            if (reporte && reporte.imagen) {
+                view.injectModalStructure(reporte);
+            } else {
+                view.showToast('📷 Este reporte no tiene imagen adjunta', 'error');
+            }
+        }
+
+        function exportarReportes() {
+            const model = new EcoAlertaModel();
+            const reportes = model.getAll();
+            
+            if (reportes.length === 0) {
+                alert('No hay reportes para exportar');
+                return;
+            }
+            
+            let csv = 'ID,Ubicación,Descripción,Estado,Fecha\n';
+            reportes.forEach(r => {
+                csv += `${r.id},"${r.referencia}","${r.descripcion}",${r.estado},${r.fecha}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `reportes_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            const view = new EcoAlertaView();
+            view.showToast('📊 Reportes exportados correctamente');
+        }
+
+        function limpiarTodos() {
+            if (!confirm('⚠️ ¿Está seguro de que desea ELIMINAR TODOS los reportes? Esta acción no se puede deshacer.')) return;
+            if (!confirm('⚠️ Confirmación final: ¿Eliminar todos los reportes?')) return;
+            
+            const model = new EcoAlertaModel();
+            const view = new EcoAlertaView();
+            
+            const reportes = model.getAll();
+            reportes.forEach(r => model.delete(r.id));
+            
+            view.showToast('🗑️ Todos los reportes han sido eliminados');
+            cargarDatos(model, view);
+        }
+
+        // ============================================================
+        //  FALLBACK: CIERRE DE SESIÓN
+        // ============================================================
+
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('#btnCerrarSesion') || e.target.closest('.logout-btn')) {
+                e.preventDefault();
+                const model = new EcoAlertaModel();
+                const view = new EcoAlertaView();
+                
+                localStorage.removeItem('eco_session');
+                localStorage.removeItem('session_user');
+                localStorage.removeItem('isLoggedIn');
+                sessionStorage.clear();
+                
+                view.showToast('👋 Sesión cerrada correctamente');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>
